@@ -1,9 +1,12 @@
 extends RigidBody2D
 
 func _ready() -> void:
-	# 从动画列表中选择一个随机动画
-	var mob_types = Array($AnimatedSprite2D.sprite_frames.get_animation_names())
-	$AnimatedSprite2D.animation = mob_types.pick_random()
+	if self.get_meta("is_gift") == 1:
+		$AnimatedSprite2D.animation = "gift"
+	else:
+		# 从动画列表中选择一个随机动画
+		var enemy_types = "type%d" % randi_range(1, 3)
+		$AnimatedSprite2D.animation = enemy_types
 	$AnimatedSprite2D.play()
 
 func _on_visible_on_screen_notifier_2d_screen_exited() -> void:

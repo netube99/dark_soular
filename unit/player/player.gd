@@ -6,8 +6,9 @@ extends Area2D
 #定义屏幕尺寸信息
 var screen_size
 
-#玩家碰撞受伤信号
+#玩家信号
 signal hit
+signal gift()
 
 func _ready() -> void:
 	#获得屏幕尺寸数据
@@ -20,14 +21,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	#判断玩家方向键操作并归一化，叠加到坐标属性上
 	var velocity = Vector2.ZERO
-	if Input.is_action_pressed("move_right"):
-		velocity.x += 1
-	if Input.is_action_pressed("move_left"):
-		velocity.x -= 1
-	if Input.is_action_pressed("move_up"):
-		velocity.y -= 1
-	if Input.is_action_pressed("move_down"):
-		velocity.y += 1
+	velocity = Input.get_vector("move_left", "move_right", "move_up", "move_down");
 	position += velocity.normalized() * speed * delta
 	position = position.clamp(Vector2.ZERO, screen_size)
 	
@@ -47,6 +41,11 @@ func start():
 	$CollisionShape2D.disabled = false
 
 func _on_body_entered(body: Node2D) -> void:
-	hide()
-	hit.emit()
-	$CollisionShape2D.set_deferred("disabled", true)
+	var is_gift = body.get_meta("is_gift")
+	if is_gift:
+		gift.emit() #发送礼物加分信号
+		body.free() #礼物已触发，删除该节点
+	else:
+		hide()
+		hit.emit()
+		$CollisionShape2D.set_deferred("disabled", true)

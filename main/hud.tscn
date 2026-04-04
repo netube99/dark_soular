@@ -2,6 +2,7 @@
 
 [ext_resource type="FontFile" uid="uid://c5yftxwvee3xf" path="res://art/Xolonium-Regular.ttf" id="1_gljsp"]
 [ext_resource type="Script" uid="uid://ev8dbaua3srq" path="res://main/hud.gd" id="1_yvbcs"]
+[ext_resource type="Script" uid="uid://daoel3glv30ie" path="res://main/score_label.gd" id="3_oakbl"]
 
 [node name="HUD" type="CanvasLayer" unique_id=1710288405]
 script = ExtResource("1_yvbcs")
@@ -9,13 +10,14 @@ script = ExtResource("1_yvbcs")
 [node name="score_label" type="Label" parent="." unique_id=267516933]
 offset_left = 8.0
 offset_top = 8.0
-offset_right = 48.0
+offset_right = 56.0
 offset_bottom = 47.0
 theme_override_fonts/font = ExtResource("1_gljsp")
 theme_override_font_sizes/font_size = 32
 text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
+script = ExtResource("3_oakbl")
 
 [node name="message_label" type="Label" parent="." unique_id=2118100409]
 anchors_preset = 8
@@ -76,7 +78,7 @@ offset_top = -200.0
 offset_right = 387.5
 offset_bottom = -183.0
 theme_override_font_sizes/font_size = 12
-text = "V1.0"
+text = "version"
 
 [connection signal="pressed" from="start_button" to="." method="_on_start_button_pressed"]
 [connection signal="timeout" from="message_timer" to="." method="_on_message_timer_timeout"]

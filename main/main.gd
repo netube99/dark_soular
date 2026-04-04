@@ -9,7 +9,20 @@ var ememy_creat_time:float
 # 玩家得分
 var score:int = 0
 
+# 奖励生成计数
+var gift_count:int = 0
+
+# 游戏音效
+var bgm_audio = AudioStreamPlayer.new()
+var one_audio = AudioStreamPlayer.new()
+
 func _ready() -> void:
+	#加载音频，创建子节点，连接播放完毕信号
+	bgm_audio.stream = preload("res://art/House In a Forest Loop.ogg")
+	add_child(bgm_audio)
+	bgm_audio.finished.connect(_on_bgm_audio_finished)
+	add_child(one_audio)
+	#bgm_audio.play() #测试BGM无缝循环
 	$enemy_timer.stop()
 	$start_timer.stop()
 	$score_timer.stop()
@@ -19,7 +32,7 @@ func new_game():
 	$HUD.update_score(score)
 	$player.start()
 	$start_timer.start()
-	$bgm_music.play()
+	bgm_audio.play()
 
 # 玩家受到攻击后返回的信号
 func _on_player_hit() -> void:
@@ -27,8 +40,9 @@ func _on_player_hit() -> void:
 	$start_timer.stop()
 	$score_timer.stop()
 	$HUD.show_game_over()
-	$bgm_music.stop()
-	$gg_music.play()
+	bgm_audio.stop()
+	one_audio.stream = preload("res://art/gameover.wav")
+	one_audio.play()
 
 # 当开始定时器触发时
 func _on_start_timer_timeout() -> void:
@@ -41,6 +55,16 @@ func _on_start_timer_timeout() -> void:
 func _on_enemy_timer_timeout() -> void:
 	# 加载敌人场景
 	var enemy = enemy_scene.instantiate()
+	
+	# 判断本次生成的是敌人还是奖励
+	var enemy_or_gift:int = 0 #默认0 生成敌人
+	enemy.set_meta("is_gift", 0)
+	gift_count += 1
+	if gift_count > 8:
+		gift_count = 0
+		enemy_or_gift = 1
+		enemy.set_meta("is_gift", 1) #给敌人场景添加一个礼物标签
+		enemy.set
 	# 在enemy_path路径上, 随机获取一个位置
 	var enemy_spawn_location = $enemy_path/enemy_spawn_Location
 	enemy_spawn_location.progress_ratio = randf()
@@ -61,10 +85,23 @@ func _on_enemy_timer_timeout() -> void:
 			$enemy_timer.wait_time = ememy_creat_time
 			print(ememy_creat_time)
 
+# UI发来开始新游戏信号
 func _on_hud_start_game() -> void:
 	new_game()
 
+# 分数每秒+1
 func _on_score_timer_timeout() -> void:
 	score += 1
-	#print("分数", score)
 	$HUD.update_score(score)
+
+# 玩家触发分数奖励信号
+func _on_player_gift() -> void:
+	score += randi_range(5, 10)
+	$HUD.update_score(score)
+	$HUD/score_label.play_combined_effects()
+	one_audio.stream = preload("res://art/Rise01.ogg")
+	one_audio.play()
+
+# BGM播放完毕触发重新播放
+func _on_bgm_audio_finished() -> void:
+	bgm_audio.play()

@@ -2,6 +2,9 @@ extends CanvasLayer
 
 signal start_game
 
+func _ready() -> void:
+	$company/version.text = "V" + ProjectSettings.get_setting("application/config/version")
+
 # 游戏结束显示
 func show_game_over():
 	$message_label.text = "YOU DIED"
